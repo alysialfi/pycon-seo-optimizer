@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>PyCon</title>
+  </head>
+
+  <body>
+    <div id="app">
+        <div class="container w-full mx-auto p-8 flex justify-center items-center flex-col">
+            <div class="flex justify-center flex-col items-center">
+                <h2 class="font-medium text-3xl">Keyword Analyzer</h2>
+                <p class="mt-2">Alayze any site on the internet, and find the potentials to boost your SEO.</p>
+            </div>
+
+            <div class="w-2/3 mt-8">
+                <form @submit.prevent="submitForm" class="w-full">
+                    <div class="mb-4">
+                        <label for="sitename" class="block text-sm font-medium text-gray-700">Sitename</label>
+                        <div class="flex">
+                            <div class="w-1/6 p-2 border border-gray-300 rounded-md rounded-tr-none rounded-br-none text-sm">https&colon;&sol;&sol;www.</div>
+                            <input v-model="form.sitename" type="text" id="sitename" placeholder="www.my-domain.com" class="block w-5/6 p-2 border border-gray-300 rounded-md rounded-tl-none rounded-bl-none shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <span class="text-xs text-gray-500">*make sure it's a spesific route, e.g. <span class="font-semibold">my-site.com/first-blog</span></span>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full py-2 px-4 bg-violet-600 text-white rounded-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-300">
+                            Analyze Keyword
+                        </button>
+                    </div>
+                </form>
+    
+                <div class="mt-16">
+                <!-- <div class="mt-16" v-else> -->
+                    <div v-if="dataKeywords.length" class="overflow-hidden bg-white rounded-lg shadow-md">
+                        <div v-for="(data, index) in dataKeywords" :key="data.category" :class="index !== 0 ? 'mt-4' : 'mt-0'">
+                            <h2 v-text="data.category" class="mt-2 font-medium"></h2>
+                            <table class="min-w-full divide-y divide-gray-200 mt-2">
+                              <thead>
+                                <tr>
+                                  <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phrase</th>
+                                  <th :class="data.category === 'Noun Phrase' ? 'hidden' : 'block'" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                                </tr>
+                              </thead>
+                              <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="phraseData in data.phrases" :key="phraseData.phrase">
+                                  <td class="px-6 py-4" v-text="phraseData.phrase" class="text-wrap"></td>
+                                  <td class="px-6 py-4 whitespace-nowrap" v-text="phraseData.count" :class="data.category === 'Noun Phrase' ? 'hidden' : 'block'"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+    const { ref, createApp, reactive, onMounted } = Vue;
+    
+    const app = createApp({
+        setup() {
+            const form = ref({
+                sitename: ''
+            });
+            const dataKeywords = ref([]);
+            const isFetching = ref(false)
+
+            const submitForm = async () => {
+                isFetching.value = true
+                console.log(form.value.sitename)
+                const sitename = `https://www.${form.value.sitename}`
+                try {
+                    const response = await fetch('/analysis-result', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({sitename: sitename})
+                    });
+                    const result = await response.json()
+                    dataKeywords.value = result;
+                    isFetching.value = false
+    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                }
+            };
+
+            onMounted(() => {
+                
+            })
+    
+            return {
+                submitForm,
+                dataKeywords,
+                isFetching,
+                form
+            };
+        }
+    });
+
+    app.mount('#app');
+    </script>
+    
+  </body>
+</html>

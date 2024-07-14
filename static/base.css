@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+:root {
+    --default-font: 'Ubuntu', sans-serif;
+    --ubuntu-light: 'Ubuntu', sans-serif;
+    --ubuntu-light-weight: 300;
+    --ubuntu-regular: 'Ubuntu', sans-serif;
+    --ubuntu-regular-weight: 400;
+    --ubuntu-medium: 'Ubuntu', sans-serif;
+    --ubuntu-medium-weight: 500;
+    --ubuntu-bold: 'Ubuntu', sans-serif;
+    --ubuntu-bold-weight: 700;
+
+    --ubuntu-light-italic: 'Ubuntu', sans-serif;
+    --ubuntu-light-italic-weight: 300;
+    --ubuntu-light-italic-style: italic;
+    --ubuntu-regular-italic: 'Ubuntu', sans-serif;
+    --ubuntu-regular-italic-weight: 400;
+    --ubuntu-regular-italic-style: italic;
+    --ubuntu-medium-italic: 'Ubuntu', sans-serif;
+    --ubuntu-medium-italic-weight: 500;
+    --ubuntu-medium-italic-style: italic;
+    --ubuntu-bold-italic: 'Ubuntu', sans-serif;
+    --ubuntu-bold-italic-weight: 700;
+    --ubuntu-bold-italic-style: italic;
+}
+
+body {
+    font-family: var(--ubuntu-regular);
+}
+
+.ubuntu-light {
+    font-family: var(--ubuntu-light);
+    font-weight: var(--ubuntu-light-weight);
+    font-style: normal;
+}
+
+.ubuntu-regular {
+    font-family: var(--ubuntu-regular);
+    font-weight: var(--ubuntu-regular-weight);
+    font-style: normal;
+}
+
+.ubuntu-medium {
+    font-family: var(--ubuntu-medium);
+    font-weight: var(--ubuntu-medium-weight);
+    font-style: normal;
+}
+
+.ubuntu-bold {
+    font-family: var(--ubuntu-bold);
+    font-weight: var(--ubuntu-bold-weight);
+    font-style: normal;
+}
+
+.ubuntu-light-italic {
+    font-family: var(--ubuntu-light-italic);
+    font-weight: var(--ubuntu-light-italic-weight);
+    font-style: var(--ubuntu-light-italic-style);
+}
+
+.ubuntu-regular-italic {
+    font-family: var(--ubuntu-regular-italic);
+    font-weight: var(--ubuntu-regular-italic-weight);
+    font-style: var(--ubuntu-regular-italic-style);
+}
+
+.ubuntu-medium-italic {
+    font-family: var(--ubuntu-medium-italic);
+    font-weight: var(--ubuntu-medium-italic-weight);
+    font-style: var(--ubuntu-medium-italic-style);
+}
+
+.ubuntu-bold-italic {
+    font-family: var(--ubuntu-bold-italic);
+    font-weight: var(--ubuntu-bold-italic-weight);
+    font-style: var(--ubuntu-bold-italic-style);
+}

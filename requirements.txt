@@ -1,0 +1,14 @@
+# Dev environment
+pip
+autopep8
+
+# App
+Flask
+requests
+beautifulsoup4
+pandas
+halo
+termcolor
+nlp-id
+nltk
+jsonlib

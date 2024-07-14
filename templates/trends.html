@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/base.css">
+    <title>PyCon</title>
+  </head>
+
+  <body>
+    <div id="app">
+        <div class="container w-full mx-auto p-8 flex justify-center items-center flex-col">
+            <div class="flex justify-center flex-col items-center">
+                <h2 class="font-medium text-3xl">Rank Comparator</h2>
+                <p class="mt-2">Query your site and competitor's to see where yours belong to.</p>
+            </div>
+
+            <div class="w-2/3 mt-8">
+                <form @submit.prevent="submitForm" class="w-full">
+                    <div class="mb-4">
+                        <label for="keyword" class="block text-sm font-medium text-gray-700">Keyword</label>
+                        <input v-model="form.keyword" type="text" id="keyword" placeholder="hosting murah" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="sitename" class="block text-sm font-medium text-gray-700">Sitename</label>
+                        <input v-model="form.sitename" type="text" id="sitename" placeholder="www.my-domain.com" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Competitors</label>
+                        <div v-for="(competitor, index) in form.competitors" :key="index" class="flex" :class="index > 0 ? 'mt-2' : 'mt-1'">
+                            <input v-model="form.competitors[index]" type="text" placeholder="www.the-competitor.com" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <div class="flex gap-2">
+                                <button @click="removeCompetitor(index)" type="button" class="ml-2 p-2 text-red-500 hover:text-red-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button @click="addCompetitor" type="button" class="p-2 text-blue-500 hover:text-blue-700 disabled:text-blue-300" :disabled="index === 2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>                             
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full py-2 px-4 bg-violet-600 text-white rounded-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-300">
+                            Check Rank
+                        </button>
+                    </div>
+                </form>
+    
+
+                <div v-if="isFetching">
+                    please wait...
+                </div>
+                <div class="mt-16" v-else>
+                    <div v-if="dataTrends.length" class="overflow-hidden bg-white shadow-md rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keyword</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URLs</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Analysis</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="(item, index) in dataTrends" :key="index">
+                                    <td class="px-6 py-4 whitespace-nowrap" v-text="item.Keyword"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" v-text="item.Rank"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <a :href="item.URLs" target="_blank" class="text-blue-500 hover:underline" v-text="item.URLs"></a>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap" v-text="item.Date"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" v-text="item.Type"></td>
+                                    <td class="px-6 py-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                        </svg>                              
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+    const { ref, createApp, reactive } = Vue;
+    
+    const app = createApp({
+        setup() {
+            const form = ref({
+                keyword: '',
+                sitename: '',
+                competitors: ['']
+            });
+            const dataTrends = ref([]);
+            const isFetching = ref(false)
+    
+            const addCompetitor = () => {
+                if (form.value.competitors.length < 3) {
+                    form.value.competitors.push('');
+                }
+            };
+    
+            const removeCompetitor = (index) => {
+                form.value.competitors.splice(index, 1);
+            };
+    
+            const submitForm = async () => {
+                isFetching.value = true
+                try {
+                    const response = await fetch('/trends-result', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(form.value)
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+    
+                    const data = await response.json();
+                    const dataParsed = JSON.parse(data)
+                    dataTrends.value = dataParsed;
+                    isFetching.value = false
+
+                } catch (error) {
+                    console.error('There was a problem with the fetch operation:', error);
+                }
+            };
+    
+            return {
+                form,
+                addCompetitor,
+                removeCompetitor,
+                submitForm,
+                dataTrends,
+            };
+        }
+    });
+
+    app.mount('#app');
+    </script>
+    
+  </body>
+</html>
