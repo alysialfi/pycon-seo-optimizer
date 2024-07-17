@@ -1,12 +1,12 @@
-# SEO Analyzer
+# SEO Analyzer 📈📉
 
 SEO Analyzer is a web application developed using Python Flask, NLP-ID, and VueJS. It will check the Google ranks for a certain URL and analyze website content to get the potential keywords.
 
-## Demo Video
+## Demo Video 📽️
 
 [Watch the demo video](https://drive.google.com/file/d/1WjgnZz81UHmYwjV0kru49PdGPasRM0UE/view?usp=sharing)
 
-## Installation
+## Installation 💻
 
 ### Prerequisites
 Make sure you have the following installed on your system:
