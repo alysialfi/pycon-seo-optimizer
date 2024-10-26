@@ -4,8 +4,6 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
 import time
-from halo import Halo
-from termcolor import colored
 
 def trends_result(data):
     # Process the data as needed
@@ -17,8 +15,6 @@ def trends_result(data):
     # keyword=hosting murah&sitename=www.domainesia.com&competitor=niagahoster.co.id
     # keyword = data.args.get('keyword')
     # sitename = data.args.get('sitename')
-    # cek = data.args.get('competitor')
-    # competitors = [cek]
 
     keyword = data.get('keyword')
     sitename = data.get('sitename')
@@ -55,19 +51,17 @@ def rank_check(sitename,serp_df,keyword,type):
             
     df = pd.DataFrame(d)
 
-    if d:  # Check if the list 'd' is not empty
+    if d:
         df = pd.DataFrame(d)
 
         df.columns = ['Keyword', 'Rank', 'URLs', 'Date', 'Type']
     else:
-        # Create an empty DataFrame with the specified columns
         df = pd.DataFrame(columns=['Keyword', 'Rank', 'URLs', 'Date', 'Type'])
 
     return df
                 
 
 def get_data(keyword,sitename,competitors):
-    # Google Search URL
     google_url = 'https://www.google.com/search?num=20&q='
 
     desktop_agent = [
@@ -80,7 +74,6 @@ def get_data(keyword,sitename,competitors):
     useragent = random.choice(desktop_agent)    
     headers = {'User-Agent': useragent}
 
-    # Make the request
     response = requests.get(google_url + keyword, headers=headers)
     
     # Check if the request was successful
@@ -115,25 +108,19 @@ def get_data(keyword,sitename,competitors):
             c = rank_check(competitor,serp_df,keyword, "Competitor")
             results = pd.concat([results, c])
 
-        # c = rank_check(competitors,serp_df,keyword, "Competitor")
-        # results = pd.concat([results, c])
-
         df = pd.DataFrame(results)
         
         df = df.sort_values(by='Rank')
             
     elif response.status_code == 429:
-        # Handle rate limiting
         print('Rate limit hit, status code 429. You are Blocked From Google')
         error_message = 'Rate limit hit, status code 429. You are Blocked From Google'
         df = pd.DataFrame({'status': [error_message]})
     else:
-        # Handle other status codes
         print(f'Failed to retrieve data, status code: {response.status_code}')
         error_message = f'Failed to retrieve data, status code: {response.status_code}'
         df = pd.DataFrame({'status': [error_message]})
 
-    # print(df.to_json(orient='records'))
     return df.to_json(orient='records')
                 
 # desktop = get_data('hosting murah','www.domainesia.com','www.niagahoster.co.id')  
