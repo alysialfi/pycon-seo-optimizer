@@ -32,33 +32,36 @@
                     </div>
                 </form>
     
-                <div class="mt-16">
-                <!-- <div class="mt-16" v-else> -->
+                <div class="mt-16 mb-8">
                     <div v-if="dataKeywords.length" class="overflow-hidden bg-white rounded-lg shadow-md">
-                        <div v-for="(data, index) in dataKeywords" :key="data.category" :class="index !== 0 ? 'mt-4' : 'mt-0'">
-                            <h2 v-text="data.category" class="mt-2 font-medium"></h2>
+                        <div>
+                            <h2 v-text="dataKeywords[0].category" class="mt-2 font-medium"></h2>
                             <table class="min-w-full divide-y divide-gray-200 mt-2">
                               <thead>
                                 <tr>
                                   <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phrase</th>
-                                  <th :class="data.category === 'Noun Phrase' ? 'hidden' : 'block'" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                                  <th :class="dataKeywords[0].category === 'Noun Phrase' ? 'hidden' : 'block'" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
                                 </tr>
                               </thead>
                               <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="phraseData in data.phrases" :key="phraseData.phrase">
+                                <tr v-for="phraseData in dataKeywords[0].phrases" :key="phraseData.phrase">
                                   <td class="px-6 py-4" v-text="phraseData.phrase" class="text-wrap"></td>
-                                  <td class="px-6 py-4 whitespace-nowrap" v-text="phraseData.count" :class="data.category === 'Noun Phrase' ? 'hidden' : 'block'"></td>
                                 </tr>
                               </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
+                <div v-for="(data, index) in dataKeywords.slice(1)" :id="`chart-${index}`">
+                    <div v-text="data.category"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
     const { ref, createApp, reactive, onMounted } = Vue;
     
@@ -72,7 +75,6 @@
 
             const submitForm = async () => {
                 isFetching.value = true
-                console.log(form.value.sitename)
                 const sitename = `https://www.${form.value.sitename}`
                 try {
                     const response = await fetch('/analysis-result', {
@@ -85,6 +87,7 @@
                     const result = await response.json()
                     dataKeywords.value = result;
                     isFetching.value = false
+                    convertDataToChart()
     
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -94,8 +97,47 @@
                 }
             };
 
+            const renderChart = async (chartData, element) => {
+                console.log(element)
+                var options = {
+                    chart: {
+                        type: 'bar',
+                        title: {
+                            text: 'My First Apex Chart',
+                            align: 'center'
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: true
+                        }
+                    },
+                    series: [{
+                        data: chartData
+                    }]
+                };
+      
+                var chart = new ApexCharts(document.querySelector(`#${element}`), options);
+                chart.render();
+            }
+
+            const convertDataToChart = () => {
+                dataKeywords.value.slice(1).forEach((data, index) => {
+                    let chartSeries = []
+                    data.phrases.forEach((data) => {
+                        chartSeries.push({
+                            x: data.phrase,
+                            y: data.count
+                        })
+                    })
+                    setTimeout(() => {
+                        renderChart(chartSeries, `chart-${index}`);
+                    }, 200)
+                })
+            }
+
             onMounted(() => {
-                
+                // renderChart([], 'chart-0');
             })
     
             return {
